@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@*<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>*@
+<div class="d-grid justify-content-center">    
+    <h1 class="display-4"> Alleged Camera Censor </h1>
+    <form>
+        <div class="form-group">
+            <input class="form-control" data-bind="value: plateQuery" style="max-width: 300px; margin-top:40px;" placeholder="Search for a License Plate..."/>
+            <input type="submit" value="Vehicle Arrival" style="max-width: 300px; margin-top:20px;" class="btn btn-info" data-bind="click: getLicensePlate" />
+        </div>
+    </form>
+</div>
+
+@section scripts{
+    <script>
+        var connection = new signalR.HubConnectionBuilder().withUrl('/parkingHub').build();
+        this.vm = new generalPAViewModel(null);
+        ko.applyBindings(this.vm);
+        connection.start().then(function() {
+            console.log('connected');
+        }).catch(function(err) {
+            return console.error(err.toString());
+        });
+    </script>
+}

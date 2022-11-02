@@ -1,0 +1,170 @@
+﻿@using ParkingApp.Models
+@model ParkingApp.Models.PagedData<ParkingActivity>
+
+@{
+    ViewData["Title"] = "Completed";
+}
+
+<h1>Completed activities</h1>
+@*<div class="d-flex justify-content-between row">
+    <div class="col-2">
+        <input name="checkInDate" class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" id="searchBar" type="search" placeholder="Check In Date" aria-label="Search" data-bind="value: searchQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivityCompleted">
+    </div>
+    <div class="col-2">
+        <input name="checkOutDate" class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" id="searchBar" type="search" placeholder="Check Out Date" aria-label="Search" data-bind="value: checkOutQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivityCompleted">
+    </div>
+    <div class="col-2">
+        <input class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" id="searchBar" type="search" placeholder="Plate" aria-label="Search" data-bind="value: plateQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivityCompleted">
+    </div>
+    <div class="col-2">
+        <input class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" id="searchBar" type="search" placeholder="Full Name" aria-label="Search" data-bind="value: fullNameQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivityCompleted">
+    </div>
+    <div class="col-1">
+        <button class="btn btn-outline-primary my-2 my-sm-0" id="searchBtn" data-bind="click: searchActivityCompleted">Search</button>
+    </div>
+    <div class="col-2">
+        <button class="btn btn-outline-danger my-2 my-sm-0" id="searchBtn" data-bind="click: removeFiltersCompleted">Remove Filters</button>
+    </div>
+</div>*@
+<table class="table" id="table" style="display:none" data-bind="visible: loading()===false">
+    <thead>
+        <tr>
+            <td>
+                <input name="checkInDate" class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" 
+                id="searchBar" type="search" placeholder="Check In Date" aria-label="Search" 
+                data-bind="value: searchQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivityCompleted" autocomplete="off">
+            </td>
+            <td>
+                <input name="checkOutDate" class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" 
+                id="searchBar" type="search" placeholder="Check Out Date" aria-label="Search" 
+                data-bind="value: checkOutQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivityCompleted" autocomplete="off">
+            </td>
+            <td>
+                <input class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" id="searchBar" 
+                type="search" placeholder="Full Name" aria-label="Search" 
+                data-bind="value: fullNameQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivityCompleted" autocomplete="off">
+            </td>
+            <td>
+                <input class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" id="searchBar" 
+                type="search" placeholder="Plate" aria-label="Search"
+                data-bind="value: plateQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivityCompleted" autocomplete="off">
+            </td>
+            <td>
+                <button class="btn btn-info my-2 my-sm-0" id="searchBtn" data-bind="click: searchActivityCompleted">Search</button>
+            </td>
+            <td>
+                <button class="btn btn-outline-info my-2 my-sm-0" id="searchBtn" data-bind="click: removeFiltersCompleted">Remove Filters</button>
+            </td>
+        </tr>
+    </thead>
+    <tbody class="border-secondary">
+        <tr>
+            <th>
+                Check In
+            </th>
+            <th>
+                Check Out
+            </th>
+            <th>
+                Full Name
+            </th>
+            <th>
+                Plate
+            </th>
+            <th>
+                Status
+            </th>
+            <th></th>
+        </tr>
+    </tbody>
+    <tbody data-bind="foreach: activities">
+        <tr>
+            <td data-bind="text: formatDate(CheckIn())">
+            </td>
+            <td data-bind="text: formatDate(CheckOut())">
+            </td>
+            <td data-bind="text: FullName()">
+            </td>
+            <td data-bind="text: Plate()">
+            </td>
+            <td data-bind="text: Status()">
+            </td>
+            <td>
+
+            </td>
+        </tr>
+    </tbody>
+</table>
+<div class="container" style="font-size: 50px; color: white;" data-bind="text:'No Results Found.',visible: activities().length === 0 && loading() === false">
+    @*<h1 data-bind="visible: activities().length === 0 && loading() === false">No results found.</h1>*@
+</div>
+<div class="container d-flex justify-content-center">
+    <div class="lds-ellipsis" data-bind="visible: loading"><div></div><div></div><div></div><div></div></div>
+</div>
+<div class="pager d-flex justify-content-center mb-2" data-bind="visible: loading()===false">
+    <ul class="pagination" style="display:none" data-bind="foreach: pageGroup, visible: totalPages() > 1 && loading()===false">
+        <li class="page-item active" data-bind="visible: isSelected">
+            <a class="page-link" href="#" data-bind="text: page, click: $parent.goToPageCompleted"> </a>
+        </li>
+        <li class="page-item" data-bind="visible: isSelected === false">
+            <a class="page-link" href="#" data-bind="text: page, click: $parent.goToPageCompleted"> </a>
+        </li>
+    </ul>
+</div>
+
+@section Scripts {
+    <script>
+        var myArray = JSON.parse('@Html.Raw(Json.Serialize(Model.Data))');
+        var totalPages = JSON.parse('@Html.Raw(Json.Serialize(Model.TotalPages))');
+        var connection = new signalR.HubConnectionBuilder().withUrl('/parkingHub').build();
+        this.vm = new generalPAViewModel(myArray);
+        ko.applyBindings(this.vm);
+        this.vm.initPages(totalPages);
+        connection.start().then(function() {
+            console.log('connected');
+        }).catch(function(err) {
+            return console.error(err.toString());
+        });
+        $(function() {
+
+            $('input[name="checkInDate"]').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+
+            $('input[name="checkInDate"]').on('apply.daterangepicker', function(ev, picker) {
+                vm.searchQueryString(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+            });
+
+            $('input[name="checkInDate"]').on('cancel.daterangepicker', function(ev, picker) {
+                vm.searchQueryString('');
+            });
+
+        });
+        $(function() {
+
+            $('input[name="checkOutDate"]').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+
+            $('input[name="checkOutDate"]').on('apply.daterangepicker', function(ev, picker) {
+                vm.checkOutQueryString(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+            });
+
+            $('input[name="checkOutDate"]').on('cancel.daterangepicker', function(ev, picker) {
+                vm.checkOutQueryString('');
+            });
+
+        });
+
+
+
+        
+        vm.loading(false);
+    </script>
+}

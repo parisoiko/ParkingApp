@@ -1,0 +1,106 @@
+﻿@using ParkingApp.Models
+@model ParkingApp.Models.PagedData<ParkingVehicle>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Vehicles</h1>
+
+@*<div class="container-fluid">
+    <div class="d-flex row">
+        <div class="col-6">
+            <input class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" id="searchBar" type="search" placeholder="Search" aria-label="Search" data-bind="value: searchQueryString, valueUpdate: 'afterkeydown', enterkey: searchProduct">
+        </div>
+        <div class="col-3">
+            <button class="btn btn-outline-primary my-2 my-sm-0" id="searchBtn" data-bind="click: searchVehicle">Search</button>
+        </div>
+    </div>
+</div>*@
+<table class="table" id="table" style="display:none" data-bind="visible: loading()===false">
+    <thead>
+        <tr>
+            <td>
+                <input class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" id="searchBar"
+                       type="search" placeholder="Search Plate" aria-label="Search"
+                       data-bind="value: searchQueryString, valueUpdate: 'afterkeydown', enterkey: searchProduct" autocomplete="off">
+            </td>
+            <td>
+                <button class="btn btn-info my-2 my-sm-0" id="searchBtn" data-bind="click: searchVehicle">Search</button>
+            </td>
+            <td>
+            </td>
+            <td>
+                <a class="btn btn-outline-info" asp-action="Create">Create New</a>
+            </td>
+        </tr>
+    </thead>
+    <tbody style="border-style: inset;">
+        <tr>
+            <th>
+                Full Name
+            </th>
+            <th>
+                Plate
+            </th>
+            <th>
+                FleetOrVisitor
+            </th>
+            <th></th>
+        </tr>
+    </tbody>
+    <tbody style="border-style: inset;" data-bind="foreach: vehicles">
+        <tr>
+            <td data-bind="text: FullName()">
+            </td>
+            <td data-bind="text: Plate()">
+            </td>
+            <td data-bind="text: FOVShow()">
+            </td>
+            <td>
+                <ul class="pagination">
+                    <li class="page-item active" id="edit">
+                        <a class="page-link" id="edit" data-bind="attr: { 'href': '@Url.Action("Edit", "ParkingVehicles")/' + VehicleId() }" class="cssClass"> Edit </a>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<div class="container" style="font-size: 50px; color: white;" data-bind="text: 'No Results Found.',visible: vehicles().length === 0 && loading() === false">
+    @*<h1 data-bind="visible: vehicles().length === 0 && loading() === false">No results found.</h1>*@
+</div>
+<div class="container d-flex justify-content-center">
+    <div class="lds-ellipsis" data-bind="visible: loading"><div></div><div></div><div></div><div></div></div>
+</div>
+
+<div class="pager d-flex justify-content-center mb-2" data-bind="visible: loading()===false">
+    <ul class="pagination" style="display:none" data-bind="foreach: pageGroup, visible: totalPages() > 1 && loading()===false">
+        <li class="page-item active" data-bind="visible: isSelected">
+            <a class="page-link" href="#" data-bind="text: page, click: $parent.goToPage"> </a>
+        </li>
+        <li class="page-item" data-bind="visible: isSelected === false">
+            <a class="page-link" href="#" data-bind="text: page, click: $parent.goToPage"> </a>
+        </li>
+    </ul>
+</div>
+
+@section scripts {
+    <script>
+        var myArray = JSON.parse('@Html.Raw(Json.Serialize(Model.Data))');
+        var totalPages = JSON.parse('@Html.Raw(Json.Serialize(Model.TotalPages))');
+        var connection = new signalR.HubConnectionBuilder().withUrl('/parkingHub').build();
+        this.vm = new generalViewModel(myArray);
+        ko.applyBindings(this.vm);
+        this.vm.initPages(totalPages);
+
+        connection.start().then(function() {
+            console.log('connected');
+        }).catch(function(err) {
+            return console.error(err.toString());
+        });
+
+        console.log("everything ready");
+        vm.loading(false);
+    </script>
+}

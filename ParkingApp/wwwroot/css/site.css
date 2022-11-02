@@ -1,0 +1,186 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+html, body {
+    margin-bottom: 60px;
+    margin: 0;
+    background: linear-gradient(45deg, #49a09d, #5f2c82);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 100;
+    min-height: 100vh;
+}
+
+h1 {
+    color: #fff;
+}
+
+/*.container {
+    padding: 2em;
+}
+
+.bold-blue {
+    font-weight: bold;
+    color: #0277BD;
+}*/
+
+tbody, td, tfoot, th, thead, tr {
+    border-color: unset;
+    border-style: unset;
+    border-width: 0;
+}
+
+table {
+    border-collapse: collapse;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+#table th {
+    padding: 15px;
+    background-color: rgba(255,255,255,0.2);
+    color: #fff;
+    justify-content: center;
+}
+
+#table td {
+    color: #fff;
+}
+
+#table thead > th {
+    background-color: #55608f;
+}
+
+.page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #49a09d;
+    border-color: #49a09d;
+}
+
+#edit {
+    z-index: 3;
+    color: #fff;
+    background-color: #49a09d;
+    border-color: #49a09d;
+    border-radius: 5px;
+}
+
+.page-link {
+    position: relative;
+    display: block;
+    color: #49a09d;
+    background-color: #fff;
+}
+
+.btn-info {
+    color: #fff;
+    background-color: #49a09d;
+    border-color: #49a09d;
+}
+
+tbody .btn-outline-info {
+    color: #fff;
+    border-color: transparent;
+    background-color: none;
+    padding: 0px;
+}
+.btn-outline-info {
+    color: #fff;
+    border-color: transparent;
+    background-color: none;
+}
+
+.btn-info:hover {
+    background-color: #007546;
+    border-color: #007546;
+    color: #fff;
+}
+
+.btn-outline-info:hover {
+    color: #fff;
+    border-color: #49a09d;
+    background-color: #49a09d;
+}
+
+label, h4 {
+    color: #fff;
+}
+
+.lds-ellipsis {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+    .lds-ellipsis div {
+        position: absolute;
+        top: 33px;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: #fff;
+        animation-timing-function: cubic-bezier(0, 1, 1, 0);
+    }
+
+        .lds-ellipsis div:nth-child(1) {
+            left: 8px;
+            animation: lds-ellipsis1 0.6s infinite;
+        }
+
+        .lds-ellipsis div:nth-child(2) {
+            left: 8px;
+            animation: lds-ellipsis2 0.6s infinite;
+        }
+
+        .lds-ellipsis div:nth-child(3) {
+            left: 32px;
+            animation: lds-ellipsis2 0.6s infinite;
+        }
+
+        .lds-ellipsis div:nth-child(4) {
+            left: 56px;
+            animation: lds-ellipsis3 0.6s infinite;
+        }
+
+@keyframes lds-ellipsis1 {
+    0% {
+        transform: scale(0);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes lds-ellipsis3 {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(0);
+    }
+}
+
+@keyframes lds-ellipsis2 {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(24px, 0);
+    }
+}

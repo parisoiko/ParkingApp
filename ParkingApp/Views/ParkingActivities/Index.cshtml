@@ -1,0 +1,236 @@
+﻿@using ParkingApp.Models
+@model ParkingApp.Models.PagedData<ParkingActivity>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Activities</h1>
+
+@*<p>
+    <a asp-action="Create">Create New</a>
+</p>*@
+@*<div class="d-flex justify-content-between row">
+    <div class="col-2">
+        <input placeholder="Check In Date" name="checkInDate" class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" id="searchBar" type="search" value="" aria-label="Search" data-bind="value: searchQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivity">
+    </div>
+    <div class="col-2">
+text-size-adjust   <input placeholder="Plate" class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" id="searchBar" type="search" aria-label="Search" data-bind="value: plateQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivity">
+    </div>
+    <div class="col-2">
+        <input placeholder="Full Name" class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em" id="searchBar" type="search" aria-label="Search" data-bind="value: fullNameQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivity">
+    </div>
+    <div class="col-1">
+        <button class="btn btn-outline-primary my-2 my-sm-0" id="searchBtn" data-bind="click: searchActivity">Search</button>
+    </div>
+    <div class="col-2">
+        <button class="btn btn-outline-danger my-2 my-sm-0" id="searchBtn" data-bind="click: removeFiltersInProgress">Remove Filters</button>
+    </div>
+</div>*@
+<table class="table" id="table" style="display:none" data-bind="visible: loading()===false">
+    <thead>
+        <tr>
+            <td>
+                <input placeholder="Check In Date" name="checkInDate"
+                       class="form-control my-2 my-lg-0 mr-sm-2" style="margin-right: 0.5em"
+                       id="searchBar" type="search" value="" aria-label="Search"
+                       data-bind="value: searchQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivity" autocomplete="off">
+            </td>
+            <td>
+                <input placeholder="Full Name" class="form-control my-2 my-lg-0 mr-sm-2"
+                       style="margin-right: 0.5em" id="searchBar" type="search" aria-label="Search"
+                       data-bind="value: fullNameQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivity" autocomplete="off">
+            </td>
+            <td>
+                <input placeholder="Plate" class="form-control my-2 my-lg-0 mr-sm-2"
+                       style="margin-right: 0.5em" id="searchBar" type="search" aria-label="Search"
+                       data-bind="value: plateQueryString, valueUpdate: 'afterkeydown', enterkey: searchActivity" autocomplete="off">
+            </td>
+            <td>
+                <button class="btn btn-info my-2 my-sm-0" id="searchBtn" data-bind="click: searchActivity">Search</button>
+            </td>
+            <td>
+                <button class="btn btn-outline-info my-2 my-sm-0" id="searchBtn" data-bind="click: removeFiltersInProgress">Remove Filters</button>
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>
+                CheckIn
+            </th>
+            <th>
+                FullName
+            </th>
+            <th>
+                Plate
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </tbody>
+    <tbody data-bind="foreach: activities">
+        <tr>
+            <td data-bind="text: formatDate(CheckIn())">
+            </td>
+            <td data-bind="text: FullName">
+            </td>
+            <td data-bind="text: Plate">
+            </td>
+            <td data-bind="text: Status">
+            </td>
+            <td>
+                @*<a data-bind="attr: { 'href': '@Url.Action("CompleteActivity", "ParkingActivities")/' + Id() }" class="cssClass"> Complete  </a>*@
+                <button class="btn btn-outline-info" data-bind="click: $parent.completeActivity"> Complete Activity </button>
+            </td>
+            @*<td>
+            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> ADD COMPLETE ACTIVITY HERE
+            </td>*@
+        </tr>
+    </tbody>
+</table>
+<div class="container" style="font-size: 50px; color: white;" data-bind="text:'No Results Found.',visible: activities().length === 0 && loading() === false">
+    @*<h1 data-bind="visible: activities().length === 0 && loading() === false">No results found.</h1>*@
+</div>
+<div class="container d-flex justify-content-center">
+    <div class="lds-ellipsis" data-bind="visible: loading"><div></div><div></div><div></div><div></div></div>
+</div>
+<div class="pager d-flex justify-content-center mb-2" data-bind="visible: totalPages() > 1 && loading()===false" >
+    <ul class="pagination" style="display:none" data-bind="foreach: pageGroup, visible: totalPages() > 1 && loading()===false">
+        <li class="page-item active" data-bind="visible: isSelected && $parent.loading()===false">
+            <a class="page-link" href="#" data-bind="text: page, click: $parent.goToPageActivity, visible: $parent.loading()===false"> </a>
+        </li>
+        <li class="page-item" data-bind="visible: isSelected === false && $parent.loading()===false">
+            <a class="page-link" href="#" data-bind="text: page, click: $parent.goToPageActivity, visible: $parent.loading()===false"> </a>
+        </li>
+    </ul>
+</div>
+
+
+
+
+
+<div class="modal fade" id="alterModal" tabindex="-1" role="dialog" aria-labelledby="alterModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alterModalLabel">Vehicle Arrival</h5>
+            </div>
+            <div class="modal-body">
+                <div data-bind="with: showcasedVehicle">
+                    <div class="row" data-bind="visible: $parent.editable() === false">
+                        <h5 data-bind="text: Plate()" class="text-success"></h5>
+                        <label class="text-success">Full Name: </label>
+                        <p data-bind="text: FullName()"></p>
+                        <label class="text-success">Fleet/Visitor: </label>
+                        <p data-bind="text: FleetOrVisitor().title"></p>
+                    </div>
+                    <div class="row" data-bind="visible: $parent.editable">
+                        <h5 data-bind="text: Plate" class="text-success"></h5>
+                        <label class="text-success">Full name: </label>
+                        <input data-bind="value: FullName, valueUpdate: 'afterkeydown'" />
+                        <label class="text-success">Visitor(0)/Fleet(1): </label>
+                        <select data-bind="options: FleetOrVisitorList,
+                                           optionsText: 'title',
+                                           value: FleetOrVisitor">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bind="click: insertVehicle">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        var myArray = JSON.parse('@Html.Raw(Json.Serialize(Model.Data))');
+        var totalPages = JSON.parse('@Html.Raw(Json.Serialize(Model.TotalPages))');
+        var connection = new signalR.HubConnectionBuilder().withUrl('/parkingHub').build();
+        this.vm = new generalPAViewModel(myArray);
+        ko.applyBindings(this.vm);
+        this.vm.initPages(totalPages);
+        connection.start().then(function() {
+            console.log('connected');
+        }).catch(function(err) {
+            return console.error(err.toString());
+        });
+
+        connection.on("vehicleArrival", function(vh) {
+            console.log("vehicle arrival time");
+            console.log(vh);
+            vm.vehicleArrival(vh);
+            console.log("im past it");
+        });
+
+        //$(function() {
+        //    $('input[name="checkInDate"]').daterangepicker({
+        //        singleDatePicker: true,
+        //        showDropdowns: true,
+        //        minYear: 1901,
+        //        autoUpdateInput: false,
+        //        maxYear: parseInt(moment().format('YYYY'), 10),
+        //        locale: {
+        //            format: 'YYYY-MM-DD',
+        //            cancelLabel: 'Clear',
+        //             applyLabel: 'Apply'
+        //            //format: 'M/DD hh:mm A'
+        //        },
+        //    }, function(start, end, label) {
+        //        var years = moment().diff(start, 'years');
+        //    });
+
+        //    $('input[name="checkInDate"]').on('apply.daterangepicker', function(ev, picker) {
+        //        //$(this).val(picker.startDate.format('YYYY-MM-DD'));
+        //        vm.searchQueryString(picker.startDate.format('YYYY-MM-DD'));
+        //    });
+        //});
+
+        $(function() {
+
+            $('input[name="checkInDate"]').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+
+            $('input[name="checkInDate"]').on('apply.daterangepicker', function(ev, picker) {
+                vm.searchQueryString(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+            });
+
+            $('input[name="checkInDate"]').on('cancel.daterangepicker', function(ev, picker) {
+                vm.searchQueryString('');
+            });
+
+        });
+
+        var $table = $('#table');
+        $(function() {
+            $('#toolbar').find('select').change(function() {
+                $table.bootstrapTable('refreshOptions', {
+                    exportDataType: $(this).val()
+                });
+            });
+        })
+
+        var trBoldBlue = $("table");
+
+        $(trBoldBlue).on("click", "tr", function() {
+            $(this).toggleClass("bold-blue");
+        });
+
+
+
+
+        
+        this.vm.loading(false);
+    </script>
+}
